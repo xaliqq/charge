@@ -1,0 +1,62 @@
+@font-face {
+  font-family: 'Cera'; /* Font family name for later reference */
+  src: url('../assets/fonts/CeraRoundProDEMO-Black.otf') format('opentype'); /* Regular font */
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Cera'; /* Font family name for later reference */
+  src: url('../assets/fonts/CeraRoundProDEMO-Bold.otf') format('opentype'); /* Regular font */
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Cera'; /* Font family name for later reference */
+  src: url('../assets/fonts/CeraRoundProDEMO-Light.otf') format('opentype'); /* Regular font */
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Cera'; /* Font family name for later reference */
+  src: url('../assets/fonts/CeraRoundProDEMO-Medium.otf') format('opentype'); /* Regular font */
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Cera'; /* Font family name for later reference */
+  src: url('../assets/fonts/CeraRoundProDEMO-Regular.otf') format('opentype'); /* Regular font */
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Cera'; /* Font family name for later reference */
+  src: url('../assets/fonts/CeraRoundProDEMO-Thin.otf') format('opentype'); /* Regular font */
+  font-weight: 300;
+  font-style: normal;
+}
+* {
+  // font-family: 'Cera', sans-serif;
+  // font-family: 'Quicksand', sans-serif;
+  font-family: 'Montserrat', sans-serif !important;
+}
+.mainBackground {
+  background-image: url(../assets/images/kfc.svg) !important;
+  height: 100%;
+  width: 100%;
+  background-position: center;
+  background-size: cover;
+}
+
+#react-select-2-listbox {
+  z-index: 9999999999 !important;
+}
+
+.custom-select-placeholder {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.logo-box svg {
+  transform: scale(2);
+}

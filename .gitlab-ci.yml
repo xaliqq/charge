@@ -1,0 +1,22 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: always
+    - when: never
+
+stages:         
+  - build
+  - deploy
+
+build:   
+  stage: build
+  script:
+    - echo "Compiling the code..."
+    - CI="" yarn install
+    - CI="" yarn add -D sass
+    - CI="" yarn build
+    - echo "Compile complete."
+    - echo "Deploying application..."
+    - cp -r dist/* /var/www/8292-kfc
+    - chmod 777 /var/www/8292-kfc --recursive
+    - echo "Application successfully deployed."

@@ -1,0 +1,35 @@
+.sidebar-item {
+  border-radius: 1em;
+  text-decoration: none !important;
+
+  &:hover {
+    text-decoration: none !important;
+
+    background-color: var(--chakra-colors-green-1);
+    border-radius: 1em;
+
+    .sidebar-item-text,
+    .sidebar-item-icon {
+      color: white;
+    }
+    .sidebar-item-collapse-icon {
+      svg {
+        color: white;
+      }
+    }
+  }
+  &.sidebar-item-active {
+    background-color: var(--chakra-colors-green-1);
+    border-radius: 1em;
+
+    .sidebar-item-text,
+    .sidebar-item-icon {
+      color: white;
+    }
+    .sidebar-item-collapse-icon {
+      svg {
+        color: white;
+      }
+    }
+  }
+}
