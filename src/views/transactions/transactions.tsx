@@ -48,6 +48,7 @@ function Transactions() {
   const [page, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [transactionData, setTransactionData] = useState<any>(null);
+  const [token, setToken] = useState(null);
 
   console.log(queryParams);
 
@@ -66,22 +67,27 @@ function Transactions() {
   const fetchData = async () => {
     setLoading(true);
 
-    const { data } = await axios.get(
-      'https://cloud4.ninco.org:2083/api/echarge/get-token',
-      {
-        params: {
-          username: 'ECharge',
-          password: '!Sm8ZKg!%sYQYTr6'
+    let res;
+    if (!token) {
+      res = await axios.get(
+        'https://cloud4.ninco.org:2083/api/echarge/get-token',
+        {
+          params: {
+            username: 'ECharge',
+            password: '!Sm8ZKg!%sYQYTr6'
+          }
         }
-      }
-    );
+      );
+
+      setToken(res?.data?.token);
+    }
 
     const resTransaction = await fetch(
-      `https://cloud4.ninco.org:2083/api/echarge/get-transactions?page=${page}`,
+      `https://cloud4.ninco.org:2083/api/echarge/get-transactions?pageIndex=${page}`,
       {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${data?.token}`
+          Authorization: `Bearer ${token || res?.data?.token}`
         }
       }
     );
@@ -279,7 +285,7 @@ function Transactions() {
       </Box>
       <Box mt={5} shadow="lg" bg="white" borderRadius={6} w="100%" p={4}>
         <Heading size="xs" mb={1} fontWeight="medium">
-          CƏDVƏL
+          CƏDVƏL ({transactionData?.totalCount || 0})
         </Heading>
         {!loading ? (
           <Box>
