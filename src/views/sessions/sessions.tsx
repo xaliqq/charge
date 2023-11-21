@@ -44,7 +44,7 @@ interface IOrdersFilter {
   // status: string;
 }
 
-function Transactions() {
+function Sessions() {
   const location = useLocation();
   console.log(location, 'asd');
 
@@ -52,7 +52,7 @@ function Transactions() {
   const [queryParams, setQueryParams] = useState<IHTTPSParams[]>([]);
   const [page, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [transactionData, setTransactionData] = useState<any>(null);
+  const [sessionData, setSessionData] = useState<any>(null);
   const [token, setToken] = useState(null);
 
   console.log(queryParams);
@@ -87,8 +87,11 @@ function Transactions() {
       setToken(res?.data?.token);
     }
 
-    const resTransaction = await fetch(
-      `https://cloud4.ninco.org:2083/api/echarge/get-transactions?pageIndex=${page}&orderStatus=${status}`,
+    const url =
+      status === 0 ? 'cable-states-hooks' : 'order-status-changed-hooks';
+
+    const resSession = await fetch(
+      `https://cloud4.ninco.org:2083/api/echarge/${url}?pageIndex=${page}`,
       {
         method: 'GET',
         headers: {
@@ -97,9 +100,9 @@ function Transactions() {
       }
     );
 
-    const resTransactionJson = await resTransaction.json();
+    const resSessionJson = await resSession.json();
 
-    setTransactionData(resTransactionJson);
+    setSessionData(resSessionJson);
     setLoading(false);
   };
 
@@ -142,8 +145,8 @@ function Transactions() {
         <Flex align="center">
           <Breadcrumb>
             <BreadcrumbItem>
-              <BreadcrumbLink isCurrentPage href="/transactions">
-                Transactions
+              <BreadcrumbLink isCurrentPage href="/sessions">
+                Sessions
               </BreadcrumbLink>
             </BreadcrumbItem>
           </Breadcrumb>
@@ -274,7 +277,7 @@ function Transactions() {
             </Grid>
             <Flex mt={2} justify="space-between" align="center">
               <Heading size="xs" mb={1} fontWeight="medium">
-                CƏDVƏL ({transactionData?.totalCount || 0})
+                CƏDVƏL ({sessionData?.totalCount || 0})
               </Heading>
               <div>
                 <IconButton
@@ -299,32 +302,40 @@ function Transactions() {
                 <Thead textAlign="left">
                   <Tr>
                     <Th textAlign="left" textTransform="initial">
-                      MƏNTƏQƏ ADI
+                      İD
                     </Th>
-                    <Th textTransform="initial">ÖDƏNİLƏN MƏBLƏĞ</Th>
-                    <Th textTransform="initial">VALYUTA</Th>
-                    <Th textTransform="initial">İSTİFADƏ MÜDDƏTİ</Th>
-                    <Th textTransform="initial">SAATLIQ QİYMƏT</Th>
+                    <Th textTransform="initial">MƏNTƏQƏ İD</Th>
+                    {location?.state?.status === 1 ? (
+                      <>
+                        <Th textTransform="initial">SESSİYA İD</Th>
+                        <Th textTransform="initial">SƏBƏB</Th>
+                      </>
+                    ) : (
+                      <Th textTransform="initial">CABLE STATE</Th>
+                    )}
+                    <Th textTransform="initial">CONNECTOR</Th>
                     <Th textTransform="initial">BAŞLAMA MÜDDƏTİ</Th>
                     <Th textTransform="initial">BAŞLAMA MÜDDƏTİ (SAAT)</Th>
-                    <Th textTransform="initial">BİTMƏ MÜDDƏTİ</Th>
-                    <Th textTransform="initial">BİTMƏ MÜDDƏTİ (SAAT)</Th>
                   </Tr>
                 </Thead>
                 <Tbody textAlign="left">
-                  {transactionData?.data?.length > 0 ? (
-                    transactionData?.data?.map((item: any) => (
+                  {sessionData?.data?.length > 0 ? (
+                    sessionData?.data?.map((item: any) => (
                       <Tr textAlign="left" key={item?.id}>
-                        <Td textAlign="left">{item?.chargePointName || '-'}</Td>
+                        <Td textAlign="left">{item?.id || '-'}</Td>
+                        {location?.state?.status === 1 ? (
+                          <>
+                            <Td>{item?.sessionId || '-'}</Td>
+                            <Td>{item?.finishReason || '-'}</Td>
+                          </>
+                        ) : (
+                          <Td>{item?.cableState || '-'}</Td>
+                        )}
+                        <Td>{item?.chargePointId || '-'}</Td>
 
-                        <Td>{item?.amount || '-'}</Td>
-                        <Td>{item?.currency || '-'}</Td>
-                        <Td>{item?.duration || '-'}</Td>
-                        <Td>{item?.pricePerHour || '-'}</Td>
-                        <Td>{item?.startDate?.substring(0, 10) || '-'}</Td>
-                        <Td>{item?.startDate?.substring(11, 19) || '-'}</Td>
-                        <Td>{item?.endDate?.substring(0, 10) || '-'}</Td>
-                        <Td>{item?.endDate?.substring(11, 19) || '-'}</Td>
+                        <Td>{item?.connector || '-'}</Td>
+                        <Td>{item?.createdDate?.substring(0, 10) || '-'}</Td>
+                        <Td>{item?.createdDate?.substring(11, 19) || '-'}</Td>
                       </Tr>
                     ))
                   ) : (
@@ -341,7 +352,7 @@ function Transactions() {
                 </Tbody>
               </Table>
             </TableContainer>
-            {transactionData?.totalCount !== 0 && (
+            {sessionData?.totalCount !== 0 && (
               <Flex
                 justify="flex-end"
                 style={{
@@ -351,9 +362,7 @@ function Transactions() {
                 <Pagination
                   currentPage={page}
                   totalCount={
-                    transactionData?.totalCount
-                      ? transactionData?.totalCount
-                      : 0
+                    sessionData?.totalCount ? sessionData?.totalCount : 0
                   }
                   pageSize={10}
                   onPageChange={(z: number) => setCurrentPage(z)}
@@ -380,4 +389,4 @@ function Transactions() {
   );
 }
 
-export default Transactions;
+export default Sessions;

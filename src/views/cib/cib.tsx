@@ -44,7 +44,7 @@ interface IOrdersFilter {
   // status: string;
 }
 
-function Transactions() {
+function Cib() {
   const location = useLocation();
   console.log(location, 'asd');
 
@@ -52,7 +52,7 @@ function Transactions() {
   const [queryParams, setQueryParams] = useState<IHTTPSParams[]>([]);
   const [page, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [transactionData, setTransactionData] = useState<any>(null);
+  const [cibData, setCibData] = useState<any>(null);
   const [token, setToken] = useState(null);
 
   console.log(queryParams);
@@ -87,8 +87,8 @@ function Transactions() {
       setToken(res?.data?.token);
     }
 
-    const resTransaction = await fetch(
-      `https://cloud4.ninco.org:2083/api/echarge/get-transactions?pageIndex=${page}&orderStatus=${status}`,
+    const resCib = await fetch(
+      `https://cloud4.ninco.org:2083/api/echarge/cib-orders?pageIndex=${page}&status=${status}`,
       {
         method: 'GET',
         headers: {
@@ -97,9 +97,9 @@ function Transactions() {
       }
     );
 
-    const resTransactionJson = await resTransaction.json();
+    const resCibJson = await resCib.json();
 
-    setTransactionData(resTransactionJson);
+    setCibData(resCibJson);
     setLoading(false);
   };
 
@@ -142,8 +142,8 @@ function Transactions() {
         <Flex align="center">
           <Breadcrumb>
             <BreadcrumbItem>
-              <BreadcrumbLink isCurrentPage href="/transactions">
-                Transactions
+              <BreadcrumbLink isCurrentPage href="/cib">
+                Cib
               </BreadcrumbLink>
             </BreadcrumbItem>
           </Breadcrumb>
@@ -274,7 +274,7 @@ function Transactions() {
             </Grid>
             <Flex mt={2} justify="space-between" align="center">
               <Heading size="xs" mb={1} fontWeight="medium">
-                CƏDVƏL ({transactionData?.totalCount || 0})
+                CƏDVƏL ({cibData?.totalCount || 0})
               </Heading>
               <div>
                 <IconButton
@@ -298,33 +298,35 @@ function Transactions() {
               <Table whiteSpace="pre-wrap" size="sm">
                 <Thead textAlign="left">
                   <Tr>
-                    <Th textAlign="left" textTransform="initial">
-                      MƏNTƏQƏ ADI
-                    </Th>
-                    <Th textTransform="initial">ÖDƏNİLƏN MƏBLƏĞ</Th>
-                    <Th textTransform="initial">VALYUTA</Th>
-                    <Th textTransform="initial">İSTİFADƏ MÜDDƏTİ</Th>
+                    <Th />
+
+                    <Th textTransform="initial">ÖDƏNİŞ İD</Th>
+                    <Th textTransform="initial">MƏZƏNNƏ</Th>
                     <Th textTransform="initial">SAATLIQ QİYMƏT</Th>
-                    <Th textTransform="initial">BAŞLAMA MÜDDƏTİ</Th>
+                    <Th textTransform="initial">ÖDƏNİŞ MƏBLƏĞİ</Th>
+                    <Th textTransform="initial">GERİ QAYTARILAN MƏBLƏĞ</Th>
                     <Th textTransform="initial">BAŞLAMA MÜDDƏTİ (SAAT)</Th>
-                    <Th textTransform="initial">BİTMƏ MÜDDƏTİ</Th>
-                    <Th textTransform="initial">BİTMƏ MÜDDƏTİ (SAAT)</Th>
                   </Tr>
                 </Thead>
                 <Tbody textAlign="left">
-                  {transactionData?.data?.length > 0 ? (
-                    transactionData?.data?.map((item: any) => (
+                  {cibData?.data?.length > 0 ? (
+                    cibData?.data?.map((item: any, index: number) => (
                       <Tr textAlign="left" key={item?.id}>
-                        <Td textAlign="left">{item?.chargePointName || '-'}</Td>
+                        <Td textAlign="left">{(page - 1) * 10 + index + 1}</Td>
 
-                        <Td>{item?.amount || '-'}</Td>
+                        <Td>{item?.id || '-'}</Td>
                         <Td>{item?.currency || '-'}</Td>
-                        <Td>{item?.duration || '-'}</Td>
-                        <Td>{item?.pricePerHour || '-'}</Td>
-                        <Td>{item?.startDate?.substring(0, 10) || '-'}</Td>
-                        <Td>{item?.startDate?.substring(11, 19) || '-'}</Td>
-                        <Td>{item?.endDate?.substring(0, 10) || '-'}</Td>
-                        <Td>{item?.endDate?.substring(11, 19) || '-'}</Td>
+                        <Td>{item?.amount || '-'}</Td>
+                        <Td>{item?.amountCharged || '-'}</Td>
+                        {location?.state?.status === 'refunded' ? (
+                          <Td>{item?.amountRefunded}</Td>
+                        ) : (
+                          <Td>
+                            {item?.amountRefunded === 0 ? 'Yoxdur' : 'Var'}
+                          </Td>
+                        )}
+
+                        <Td>{item?.created?.substring(0, 10) || '-'}</Td>
                       </Tr>
                     ))
                   ) : (
@@ -341,7 +343,7 @@ function Transactions() {
                 </Tbody>
               </Table>
             </TableContainer>
-            {transactionData?.totalCount !== 0 && (
+            {cibData?.totalCount !== 0 && (
               <Flex
                 justify="flex-end"
                 style={{
@@ -350,11 +352,7 @@ function Transactions() {
               >
                 <Pagination
                   currentPage={page}
-                  totalCount={
-                    transactionData?.totalCount
-                      ? transactionData?.totalCount
-                      : 0
-                  }
+                  totalCount={cibData?.totalCount ? cibData?.totalCount : 0}
                   pageSize={10}
                   onPageChange={(z: number) => setCurrentPage(z)}
                 />
@@ -380,4 +378,4 @@ function Transactions() {
   );
 }
 
-export default Transactions;
+export default Cib;

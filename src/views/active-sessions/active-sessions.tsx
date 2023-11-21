@@ -1,3 +1,4 @@
+import DeleteModal from '@/components/display/delete-modal/delete-modal';
 import Pagination from '@/components/display/pagination/pagination';
 import NoData from '@/components/feedback/no-data/no-data';
 import DatePicker from '@/components/forms/date-picker/date-picker';
@@ -27,13 +28,21 @@ import {
   Thead,
   Tr,
   Stack,
-  Skeleton
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Skeleton,
+  Modal,
+  useDisclosure,
+  ModalOverlay
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { BiReset } from 'react-icons/bi';
+import { BiDotsVertical, BiReset } from 'react-icons/bi';
 import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 interface IOrdersFilter {
   name: string;
@@ -44,7 +53,7 @@ interface IOrdersFilter {
   // status: string;
 }
 
-function Transactions() {
+function ActiveSessions() {
   const location = useLocation();
   console.log(location, 'asd');
 
@@ -52,8 +61,12 @@ function Transactions() {
   const [queryParams, setQueryParams] = useState<IHTTPSParams[]>([]);
   const [page, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [transactionData, setTransactionData] = useState<any>(null);
+  const [activeSessionData, setActiveSessionData] = useState<any>(null);
   const [token, setToken] = useState(null);
+  const [providerOrderId, setProviderOrderId] = useState(null);
+  const [stopLoading, setStopLoading] = useState(false);
+
+  const deleteModal = useDisclosure();
 
   console.log(queryParams);
 
@@ -69,7 +82,7 @@ function Transactions() {
     }
   });
 
-  const fetchData = async (status: number) => {
+  const fetchData = async () => {
     setLoading(true);
 
     let res;
@@ -87,8 +100,8 @@ function Transactions() {
       setToken(res?.data?.token);
     }
 
-    const resTransaction = await fetch(
-      `https://cloud4.ninco.org:2083/api/echarge/get-transactions?pageIndex=${page}&orderStatus=${status}`,
+    const resActiveSession = await fetch(
+      `https://cloud4.ninco.org:2083/api/echarge/get-transactions?pageIndex=${page}&sessionStatus=1`,
       {
         method: 'GET',
         headers: {
@@ -97,9 +110,9 @@ function Transactions() {
       }
     );
 
-    const resTransactionJson = await resTransaction.json();
+    const resActiveSessionJson = await resActiveSession.json();
 
-    setTransactionData(resTransactionJson);
+    setActiveSessionData(resActiveSessionJson);
     setLoading(false);
   };
 
@@ -111,9 +124,30 @@ function Transactions() {
     setRefreshComponent(!refreshComponent);
   };
 
+  const startStop = async () => {
+    setStopLoading(true);
+    try {
+      await axios.get(
+        'https://cloud4.ninco.org:2083/api/echarge/stop-by-client',
+        {
+          params: {
+            orderId: providerOrderId
+          }
+        }
+      );
+      fetchData();
+      toast.success('Əməliyyat uğurla icra edildi');
+      deleteModal.onClose();
+      setStopLoading(false);
+    } catch (error) {
+      setStopLoading(false);
+      toast.error('Xəta baş verdi');
+    }
+  };
+
   useEffect(() => {
-    fetchData(location?.state?.status);
-  }, [page, refreshComponent, location?.state?.status]);
+    fetchData();
+  }, [page, refreshComponent]);
 
   const resetForm = () => {
     setValue('name', '');
@@ -142,8 +176,8 @@ function Transactions() {
         <Flex align="center">
           <Breadcrumb>
             <BreadcrumbItem>
-              <BreadcrumbLink isCurrentPage href="/transactions">
-                Transactions
+              <BreadcrumbLink isCurrentPage href="/activeSessions">
+                ActiveSessions
               </BreadcrumbLink>
             </BreadcrumbItem>
           </Breadcrumb>
@@ -274,7 +308,7 @@ function Transactions() {
             </Grid>
             <Flex mt={2} justify="space-between" align="center">
               <Heading size="xs" mb={1} fontWeight="medium">
-                CƏDVƏL ({transactionData?.totalCount || 0})
+                CƏDVƏL ({activeSessionData?.totalCount || 0})
               </Heading>
               <div>
                 <IconButton
@@ -309,11 +343,12 @@ function Transactions() {
                     <Th textTransform="initial">BAŞLAMA MÜDDƏTİ (SAAT)</Th>
                     <Th textTransform="initial">BİTMƏ MÜDDƏTİ</Th>
                     <Th textTransform="initial">BİTMƏ MÜDDƏTİ (SAAT)</Th>
+                    <Th />
                   </Tr>
                 </Thead>
                 <Tbody textAlign="left">
-                  {transactionData?.data?.length > 0 ? (
-                    transactionData?.data?.map((item: any) => (
+                  {activeSessionData?.data?.length > 0 ? (
+                    activeSessionData?.data?.map((item: any) => (
                       <Tr textAlign="left" key={item?.id}>
                         <Td textAlign="left">{item?.chargePointName || '-'}</Td>
 
@@ -325,6 +360,31 @@ function Transactions() {
                         <Td>{item?.startDate?.substring(11, 19) || '-'}</Td>
                         <Td>{item?.endDate?.substring(0, 10) || '-'}</Td>
                         <Td>{item?.endDate?.substring(11, 19) || '-'}</Td>
+
+                        <Td textAlign="right">
+                          <Menu>
+                            <MenuButton
+                              as={IconButton}
+                              aria-label="Options"
+                              icon={<BiDotsVertical />}
+                              variant="outline"
+                              onClick={e => {
+                                e.stopPropagation();
+                              }}
+                            />
+                            <MenuList>
+                              <MenuItem
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setProviderOrderId(item?.providerOrderId);
+                                  deleteModal.onOpen();
+                                }}
+                              >
+                                Stop
+                              </MenuItem>
+                            </MenuList>
+                          </Menu>
+                        </Td>
                       </Tr>
                     ))
                   ) : (
@@ -341,7 +401,7 @@ function Transactions() {
                 </Tbody>
               </Table>
             </TableContainer>
-            {transactionData?.totalCount !== 0 && (
+            {activeSessionData?.totalCount !== 0 && (
               <Flex
                 justify="flex-end"
                 style={{
@@ -351,8 +411,8 @@ function Transactions() {
                 <Pagination
                   currentPage={page}
                   totalCount={
-                    transactionData?.totalCount
-                      ? transactionData?.totalCount
+                    activeSessionData?.totalCount
+                      ? activeSessionData?.totalCount
                       : 0
                   }
                   pageSize={10}
@@ -376,8 +436,26 @@ function Transactions() {
           </Stack>
         )}
       </Box>
+      <Modal
+        scrollBehavior="inside"
+        isOpen={deleteModal.isOpen}
+        size="xl"
+        variant="big"
+        isCentered
+        onClose={deleteModal.onClose}
+      >
+        <ModalOverlay />
+        <DeleteModal
+          header="Əminsinizmi?"
+          text="test"
+          deleteModalButtonLoading={stopLoading}
+          event={() => startStop()}
+          eventText="Təsdiq et"
+          onClose={deleteModal.onClose}
+        />
+      </Modal>
     </>
   );
 }
 
-export default Transactions;
+export default ActiveSessions;

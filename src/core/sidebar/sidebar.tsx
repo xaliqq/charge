@@ -9,10 +9,16 @@ import {
 } from '@chakra-ui/react';
 import { FiArrowRightCircle, FiArrowLeftCircle } from 'react-icons/fi';
 import { BiUser } from 'react-icons/bi';
-import { AiOutlineUnorderedList, AiOutlineBranches } from 'react-icons/ai';
+
+import {
+  //  AiOutlineUnorderedList,
+  AiOutlineBranches
+} from 'react-icons/ai';
 import { useLocalStorage } from 'usehooks-ts';
 import { ReactComponent as Logo } from '@assets/logo/logo.svg';
 import SvgWrapper from '@/components/display/svg-wrapper/svg-wrapper';
+import { CiMenuBurger } from 'react-icons/ci';
+import { HiOutlineDocumentReport } from 'react-icons/hi';
 
 import { NavLink } from 'react-router-dom';
 
@@ -32,10 +38,11 @@ export interface ISidebarMenuElements {
   id: string;
   isDefaultCollapsed?: boolean;
   item?: ISidebarMenuElements;
-  url: string;
+  url?: string;
   isCollapsable?: boolean;
   modules?: ISidebarMenuElements[];
   isChild?: boolean;
+  state?: any;
 }
 
 function Sidebar({ onClose, isOpen, ...rest }: SidebarProps) {
@@ -43,16 +50,178 @@ function Sidebar({ onClose, isOpen, ...rest }: SidebarProps) {
     {
       id: 'element-1',
       title: 'Tranzaksiya',
-      isCollapsable: false,
-      icon: AiOutlineUnorderedList,
-      url: '/transactions'
+      isCollapsable: true,
+      icon: CiMenuBurger,
+      modules: [
+        {
+          id: 'element-1-1',
+          title: 'Ödənilməyən',
+          isCollapsable: false,
+          url: '/transactions',
+          state: {
+            status: 0,
+            id: 'element-1-1'
+          },
+          isChild: true
+        },
+        {
+          id: 'element-1-2',
+          title: 'Ödənilən',
+          isCollapsable: false,
+          url: '/transactions',
+          state: {
+            status: 3,
+            id: 'element-1-2'
+          },
+          isChild: true
+        },
+        {
+          id: 'element-1-3',
+          title: 'Geri qaytarılan',
+          isCollapsable: false,
+          url: '/transactions',
+          state: {
+            status: 5,
+            id: 'element-1-3'
+          },
+          isChild: true
+        },
+        {
+          id: 'element-1-4',
+          title: 'Rədd edilən',
+          isCollapsable: false,
+          url: '/transactions',
+          state: {
+            status: 6,
+            id: 'element-1-4'
+          },
+          isChild: true
+        },
+        {
+          id: 'element-1-5',
+          title: 'İmtina edilən',
+          isCollapsable: false,
+          url: '/transactions',
+          state: {
+            status: 8,
+            id: 'element-1-5'
+          },
+          isChild: true
+        }
+      ]
     },
+    {
+      id: 'element-8',
+      title: 'Cib',
+      isCollapsable: true,
+      icon: CiMenuBurger,
+      modules: [
+        {
+          id: 'element-8-1',
+          title: 'Ödənilməyən',
+          isCollapsable: false,
+          url: '/cib',
+          state: {
+            status: 'new',
+            id: 'element-8-1'
+          },
+          isChild: true
+        },
+        {
+          id: 'element-8-2',
+          title: 'Ödənilən',
+          isCollapsable: false,
+          url: '/cib',
+          state: {
+            status: 'charged',
+            id: 'element-8-2'
+          },
+          isChild: true
+        },
+        {
+          id: 'element-8-3',
+          title: 'Geri qaytarılan',
+          isCollapsable: false,
+          url: '/cib',
+          state: {
+            status: 'refunded',
+            id: 'element-8-3'
+          },
+          isChild: true
+        },
+        {
+          id: 'element-8-4',
+          title: 'Rədd edilən',
+          isCollapsable: false,
+          url: '/cib',
+          state: {
+            status: 'rejected',
+            id: 'element-8-4'
+          },
+          isChild: true
+        },
+        {
+          id: 'element-8-5',
+          title: 'İmtina edilən',
+          isCollapsable: false,
+          url: '/cib',
+          state: {
+            status: 'declined',
+            id: 'element-8-5'
+          },
+          isChild: true
+        }
+      ]
+    },
+    {
+      id: 'element-9',
+      title: 'Sessiyalar',
+      isCollapsable: true,
+      icon: CiMenuBurger,
+      modules: [
+        {
+          id: 'element-9-1',
+          title: 'Kabel',
+          isCollapsable: false,
+          url: '/sessions',
+          state: {
+            status: 0,
+            id: 'element-9-1'
+          },
+          isChild: true
+        },
+        {
+          id: 'element-9-2',
+          title: 'Bitiş',
+          isCollapsable: false,
+          url: '/sessions',
+          state: {
+            status: 1,
+            id: 'element-9-2'
+          },
+          isChild: true
+        }
+      ]
+    },
+    {
+      id: 'element-10',
+      title: 'Charging',
+      isCollapsable: false,
+      icon: CiMenuBurger,
 
+      url: '/active-sessions',
+      state: {
+        id: 'element-10'
+      }
+    },
     {
       id: 'element-2',
       title: 'Müştərilər',
       isCollapsable: false,
       icon: BiUser,
+      state: {
+        id: 'element-2'
+      },
       url: '/customers'
     },
     {
@@ -60,6 +229,9 @@ function Sidebar({ onClose, isOpen, ...rest }: SidebarProps) {
       title: 'Adminlər',
       isCollapsable: false,
       icon: BiUser,
+      state: {
+        id: 'element-4'
+      },
       url: '/admins'
     },
     {
@@ -67,6 +239,9 @@ function Sidebar({ onClose, isOpen, ...rest }: SidebarProps) {
       title: 'Partnyorlar',
       isCollapsable: false,
       icon: BiUser,
+      state: {
+        id: 'element-5'
+      },
       url: '/partners'
     },
     {
@@ -74,103 +249,31 @@ function Sidebar({ onClose, isOpen, ...rest }: SidebarProps) {
       title: 'Birləşdirici növləri',
       isCollapsable: false,
       icon: AiOutlineBranches,
+      state: {
+        id: 'element-6'
+      },
       url: '/connector-types'
     },
-
     {
       id: 'element-7',
       title: 'Məntəqələr',
       isCollapsable: false,
       icon: AiOutlineBranches,
+      state: {
+        id: 'element-7'
+      },
       url: '/charge-points'
+    },
+    {
+      id: 'element-11',
+      title: 'Hesabatlar',
+      isCollapsable: false,
+      icon: HiOutlineDocumentReport,
+      state: {
+        id: 'element-11'
+      },
+      url: '/reports'
     }
-    // {
-    //   id: 'element-2',
-    //   title: 'Birləşdirici',
-    //   isCollapsable: false,
-    //   icon: BiBasket,
-    //   url: '/orders1'
-    // }
-
-    // {
-    //   id: 'element-2',
-    //   title: 'Filiallar',
-    //   isCollapsable: false,
-    //   icon: BiStore,
-    //   url: '/branches'
-    // },
-
-    // {
-    //   id: 'element-3',
-    //   title: 'Müştərilər',
-    //   isCollapsable: false,
-    //   icon: FiUsers,
-    //   url: '/clients'
-    // },
-    // {
-    //   id: 'element-4',
-    //   title: 'İstifadəçilər',
-    //   isCollapsable: false,
-    //   icon: BiUser,
-    //   url: '/users'
-    // },
-    // {
-    //   id: 'element-7',
-    //   title: 'Mesajlar',
-    //   isCollapsable: false,
-    //   icon: BiMessageDetail,
-    //   url: '/messages'
-    // },
-
-    // {
-    //   id: 'element-8',
-    //   title: 'Karyera',
-    //   isCollapsable: false,
-    //   icon: IoBriefcaseOutline,
-    //   url: '/career'
-    // },
-    // {
-    //   id: 'element-8',
-    //   title: 'Müraciətlər',
-    //   isCollapsable: false,
-    //   icon: BiBookContent,
-    //   url: '/applications'
-    // },
-    // {
-    //   id: 'element-2.1',
-    //   title: 'Slayder',
-    //   isCollapsable: false,
-    //   icon: BiCarousel,
-    //   url: '/web/slider'
-    // },
-    // {
-    //   id: 'element-2.2',
-    //   title: 'Haqqımızda',
-    //   isCollapsable: false,
-    //   icon: FiInfo,
-    //   url: '/web/about'
-    // },
-    // {
-    //   id: 'element-2.3',
-    //   title: '11 İnqridient',
-    //   isCollapsable: false,
-    //   icon: BiFoodMenu,
-    //   url: '/web/eleven-ingredient'
-    // },
-    // {
-    //   id: 'element-2.4',
-    //   title: 'Kateqoriya',
-    //   isCollapsable: false,
-    //   icon: BiCategory,
-    //   url: '/category'
-    // },
-    // {
-    //   id: 'element-2.5',
-    //   title: 'Məhsul',
-    //   isCollapsable: false,
-    //   icon: MdFastfood,
-    //   url: '/product'
-    // }
   ];
 
   const [isMenuCollapsed, setIsMenuCollapsed] = useLocalStorage(

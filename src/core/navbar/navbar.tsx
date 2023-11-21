@@ -17,7 +17,7 @@ import {
   MenuList
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { BiLogOut, BiLockAlt, BiMenu } from 'react-icons/bi';
+import { BiLogOut, BiMenu } from 'react-icons/bi';
 import { FiMenu } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 import { useLocalStorage } from 'usehooks-ts';
@@ -100,14 +100,6 @@ function Navbar({ onOpen, ...rest }: NavbarProps) {
                 variant="outline"
               />
               <MenuList>
-                <MenuItem
-                  onClick={() => {
-                    passwordModal.onOpen();
-                  }}
-                  icon={<BiLockAlt />}
-                >
-                  Şifrəni dəyiş
-                </MenuItem>
                 <MenuItem
                   onClick={() => {
                     logOutModal.onOpen();

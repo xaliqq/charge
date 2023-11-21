@@ -10,8 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, Dispatch, SetStateAction } from 'react';
 import { useReadLocalStorage } from 'usehooks-ts';
-import { FiArrowDown, FiArrowUp } from 'react-icons/fi';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ISidebarMenuElements } from '../sidebar';
 import './sidebar-item.scss';
 
@@ -23,26 +22,26 @@ interface SidebarMenuItemProps {
 }
 
 function SidebarMenuItem({ item, isOpen, setIsOpen }: SidebarMenuItemProps) {
+  const navigate = useNavigate();
   const isSingleItem = !Array.isArray(item);
 
   const {
     title,
     id,
-    url,
+    url = '',
     isDefaultCollapsed = false,
     isCollapsable,
     modules,
     isChild,
-    icon
+    icon,
+    state
   } = isSingleItem
     ? (item as ISidebarMenuElements)
     : (item as ISidebarMenuElements[])[0];
 
   const isMenuCollapsed = useReadLocalStorage('menuCollapsed');
   const location = useLocation();
-  const currentURL = location.pathname;
-  const targetURL = url;
-  const isURLMatched = currentURL === targetURL;
+  const isURLMatched = id === location?.state?.id;
   const handleClick = (shouldCollapseId: string): void => {
     setIsOpen(prevIsOpen =>
       prevIsOpen.includes(shouldCollapseId)
@@ -58,7 +57,7 @@ function SidebarMenuItem({ item, isOpen, setIsOpen }: SidebarMenuItemProps) {
   return (
     <VStack w={isChild ? '100%' : '80%'}>
       <Box
-        as={!isCollapsable ? NavLink : Box}
+        as={Box}
         display="flex"
         pr={3}
         w="100%"
@@ -68,19 +67,24 @@ function SidebarMenuItem({ item, isOpen, setIsOpen }: SidebarMenuItemProps) {
         className={`${'sidebar-item'} ${
           isURLMatched ? 'sidebar-item-active' : ''
         }`}
+        onClick={() =>
+          isCollapsable ? handleClick(id) : navigate(url, { state })
+        }
         cursor="pointer"
         pl={4}
-        to={url}
         py={2}
       >
-        <Flex to={url} as={NavLink}>
-          <Icon
-            mr={4}
-            color="gray.900"
-            className="sidebar-item-icon"
-            fontSize={24}
-            as={icon}
-          />
+        <Flex>
+          {icon && (
+            <Icon
+              mr={4}
+              color="gray.900"
+              className="sidebar-item-icon"
+              fontSize={20}
+              as={icon}
+            />
+          )}
+
           {!isMenuCollapsed && (
             <Tooltip
               hasArrow
@@ -90,44 +94,29 @@ function SidebarMenuItem({ item, isOpen, setIsOpen }: SidebarMenuItemProps) {
               <Text
                 whiteSpace="nowrap"
                 className="sidebar-item-text"
-                fontSize={17}
+                fontSize={14}
                 color="gray.900"
               >
-                {title && title.length > 15
-                  ? `${title?.substring(0, 14)}..`
+                {title && title.length > 17
+                  ? `${title?.substring(0, 16)}..`
                   : title || ''}
               </Text>
             </Tooltip>
           )}
         </Flex>
-        {isCollapsable && (
-          <Box
-            className="sidebar-item-collapse-icon"
-            ml={3}
-            onClick={() => (isCollapsable ? handleClick(id) : undefined)}
-          >
-            {isOpen?.includes(id) ? (
-              <FiArrowUp size={24} color="gray.900" />
-            ) : (
-              <FiArrowDown size={24} color="gray.900" />
-            )}
-          </Box>
-        )}
       </Box>
 
       {(isCollapsable || isOpen) && (
         <Collapse in={isOpen?.includes(id) ? true : undefined}>
-          <VStack align="start" pl={10} py={1}>
-            {modules &&
-              modules.map((subGroup: ISidebarMenuElements) => (
-                <SidebarMenuItem
-                  item={subGroup}
-                  setIsOpen={setIsOpen}
-                  isOpen={isOpen}
-                  key={subGroup.title}
-                />
-              ))}
-          </VStack>
+          {modules &&
+            modules.map((subGroup: ISidebarMenuElements) => (
+              <SidebarMenuItem
+                item={subGroup}
+                setIsOpen={setIsOpen}
+                isOpen={isOpen}
+                key={subGroup.title}
+              />
+            ))}
         </Collapse>
       )}
     </VStack>

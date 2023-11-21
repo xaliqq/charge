@@ -23,6 +23,10 @@ import Partners from '@/views/partners/components/partners';
 import ConnectorTypesPage from '@/views/connector-types/pages';
 import Connectors from '@/views/connectors/components/connectors';
 import ChargePointsPage from '@/views/chargepoints/pages';
+import Cib from '@/views/cib/cib';
+import Sessions from '@/views/sessions/sessions';
+import ActiveSessions from '@/views/active-sessions/active-sessions';
+import Reports from '@/views/reports/reports';
 import Login from './login/login';
 import NotFound from './404/404';
 import NoPermission from './no-permission/no-permission';
@@ -56,6 +60,54 @@ const routes = [
           <Suspense fallback={<Spinner />}>
             {' '}
             <Transactions />
+          </Suspense>
+        ) : (
+          <Navigate to="/no-permission" />
+        ),
+        permission: ['view_services_page']
+      },
+      {
+        path: 'cib',
+        element: checkPermission(['route_orders_page']) ? (
+          <Suspense fallback={<Spinner />}>
+            {' '}
+            <Cib />
+          </Suspense>
+        ) : (
+          <Navigate to="/no-permission" />
+        ),
+        permission: ['view_services_page']
+      },
+      {
+        path: 'sessions',
+        element: checkPermission(['route_orders_page']) ? (
+          <Suspense fallback={<Spinner />}>
+            {' '}
+            <Sessions />
+          </Suspense>
+        ) : (
+          <Navigate to="/no-permission" />
+        ),
+        permission: ['view_services_page']
+      },
+      {
+        path: 'active-sessions',
+        element: checkPermission(['route_orders_page']) ? (
+          <Suspense fallback={<Spinner />}>
+            {' '}
+            <ActiveSessions />
+          </Suspense>
+        ) : (
+          <Navigate to="/no-permission" />
+        ),
+        permission: ['view_services_page']
+      },
+      {
+        path: 'reports',
+        element: checkPermission(['route_orders_page']) ? (
+          <Suspense fallback={<Spinner />}>
+            {' '}
+            <Reports />
           </Suspense>
         ) : (
           <Navigate to="/no-permission" />
