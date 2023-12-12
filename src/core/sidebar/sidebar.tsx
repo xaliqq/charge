@@ -19,6 +19,7 @@ import { ReactComponent as Logo } from '@assets/logo/logo.svg';
 import SvgWrapper from '@/components/display/svg-wrapper/svg-wrapper';
 import { CiMenuBurger } from 'react-icons/ci';
 import { HiOutlineDocumentReport } from 'react-icons/hi';
+import { MdOutlineArchive } from 'react-icons/md';
 
 import { NavLink } from 'react-router-dom';
 
@@ -47,6 +48,16 @@ export interface ISidebarMenuElements {
 
 function Sidebar({ onClose, isOpen, ...rest }: SidebarProps) {
   const sidebarMenuElements = [
+    {
+      id: 'element-11',
+      title: 'Hesabatlar',
+      isCollapsable: false,
+      icon: HiOutlineDocumentReport,
+      state: {
+        id: 'element-11'
+      },
+      url: '/reports'
+    },
     {
       id: 'element-1',
       title: 'Tranzaksiya',
@@ -265,14 +276,14 @@ function Sidebar({ onClose, isOpen, ...rest }: SidebarProps) {
       url: '/charge-points'
     },
     {
-      id: 'element-11',
-      title: 'Hesabatlar',
+      id: 'element-12',
+      title: 'Arxiv',
       isCollapsable: false,
-      icon: HiOutlineDocumentReport,
+      icon: MdOutlineArchive,
       state: {
-        id: 'element-11'
+        id: 'element-12'
       },
-      url: '/reports'
+      url: '/archive'
     }
   ];
 
@@ -306,7 +317,7 @@ function Sidebar({ onClose, isOpen, ...rest }: SidebarProps) {
       >
         {' '}
         <Box p={2} className="logo-box">
-          <Link as={NavLink} to="/transactions">
+          <Link as={NavLink} to="/reports">
             <SvgWrapper
               ratio={2 / 2}
               height={isMenuCollapsed ? '50px' : '80px'}

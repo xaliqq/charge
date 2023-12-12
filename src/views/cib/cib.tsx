@@ -39,9 +39,8 @@ interface IOrdersFilter {
   name: string;
   organizationId: string;
   orderType: string;
-  endDate: string;
-  startDate: string;
-  // status: string;
+  createdFrom: string;
+  createdTo: string;
 }
 
 function Cib() {
@@ -57,17 +56,29 @@ function Cib() {
 
   console.log(queryParams);
 
-  const { handleSubmit, setValue, control } = useForm<IOrdersFilter>({
-    mode: 'onChange',
-    defaultValues: {
-      name: '',
-      organizationId: '',
-      orderType: '',
-      endDate: '',
-      startDate: ''
-      // status: ''
+  const { handleSubmit, setValue, control, getValues } = useForm<IOrdersFilter>(
+    {
+      mode: 'onChange',
+      defaultValues: {
+        name: '',
+        organizationId: '',
+        orderType: '',
+        createdTo: '',
+        createdFrom: ''
+        // status: ''
+      }
     }
-  });
+  );
+
+  const addQueryParamsToUrl = (url: string, params: any) => {
+    const queryString = Object.keys(params)
+      .map(
+        key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
+      )
+      .join('&');
+
+    return `${url}?${queryString}`;
+  };
 
   const fetchData = async (status: number) => {
     setLoading(true);
@@ -88,7 +99,15 @@ function Cib() {
     }
 
     const resCib = await fetch(
-      `https://cloud4.ninco.org:2083/api/echarge/cib-orders?pageIndex=${page}&status=${status}`,
+      addQueryParamsToUrl(
+        'https://cloud4.ninco.org:2083/api/echarge/cib-orders',
+        {
+          pageIndex: page,
+          status,
+          createdFrom: getValues('createdFrom'),
+          createdTo: getValues('createdTo')
+        }
+      ),
       {
         method: 'GET',
         headers: {
@@ -119,8 +138,8 @@ function Cib() {
     setValue('name', '');
     setValue('organizationId', '');
     setValue('orderType', '');
-    setValue('endDate', '');
-    setValue('startDate', '');
+    setValue('createdFrom', '');
+    setValue('createdTo', '');
     // setValue('status', '');
 
     setCurrentPage(1);
@@ -204,7 +223,7 @@ function Cib() {
               <GridItem width="85%">
                 <Controller
                   control={control}
-                  name="startDate"
+                  name="createdFrom"
                   render={({ field: { onChange, value } }) => (
                     <FormControl id="address">
                       <FormLabel fontSize="sm" mb={1}>
@@ -231,7 +250,7 @@ function Cib() {
               <GridItem width="85%">
                 <Controller
                   control={control}
-                  name="endDate"
+                  name="createdTo"
                   render={({ field: { onChange, value } }) => (
                     <FormControl>
                       <FormLabel fontSize="sm" mb={1}>

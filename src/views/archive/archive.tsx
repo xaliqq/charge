@@ -40,11 +40,11 @@ interface IOrdersFilter {
   organizationId: string;
   orderType: string;
   endDate: string;
-  createdDate: string;
+  startDate: string;
   // status: string;
 }
 
-function Sessions() {
+function Archive() {
   const location = useLocation();
   console.log(location, 'asd');
 
@@ -52,36 +52,24 @@ function Sessions() {
   const [queryParams, setQueryParams] = useState<IHTTPSParams[]>([]);
   const [page, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [sessionData, setSessionData] = useState<any>(null);
+  const [cibData, setCibData] = useState<any>(null);
   const [token, setToken] = useState(null);
 
   console.log(queryParams);
 
-  const { handleSubmit, setValue, control, getValues } = useForm<IOrdersFilter>(
-    {
-      mode: 'onChange',
-      defaultValues: {
-        name: '',
-        organizationId: '',
-        orderType: '',
-        endDate: '',
-        createdDate: ''
-        // status: ''
-      }
+  const { handleSubmit, setValue, control } = useForm<IOrdersFilter>({
+    mode: 'onChange',
+    defaultValues: {
+      name: '',
+      organizationId: '',
+      orderType: '',
+      endDate: '',
+      startDate: ''
+      // status: ''
     }
-  );
+  });
 
-  const addQueryParamsToUrl = (url: string, params: any) => {
-    const queryString = Object.keys(params)
-      .map(
-        key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
-      )
-      .join('&');
-
-    return `${url}?${queryString}`;
-  };
-
-  const fetchData = async (status: number) => {
+  const fetchData = async () => {
     setLoading(true);
 
     let res;
@@ -99,16 +87,8 @@ function Sessions() {
       setToken(res?.data?.token);
     }
 
-    const url =
-      status === 0 ? 'cable-states-hooks' : 'order-status-changed-hooks';
-
-    const resSession = await fetch(
-      addQueryParamsToUrl(`https://cloud4.ninco.org:2083/api/echarge/${url}`, {
-        pageIndex: page,
-        status,
-        createdDate: getValues('createdDate')
-        // createdTo: getValues('createdTo')
-      }),
+    const resCib = await fetch(
+      `https://cloud4.ninco.org:2083/api/echarge/cib-orders?pageIndex=${page}&needArchive=true`,
       {
         method: 'GET',
         headers: {
@@ -117,9 +97,9 @@ function Sessions() {
       }
     );
 
-    const resSessionJson = await resSession.json();
+    const resCibJson = await resCib.json();
 
-    setSessionData(resSessionJson);
+    setCibData(resCibJson);
     setLoading(false);
   };
 
@@ -132,15 +112,15 @@ function Sessions() {
   };
 
   useEffect(() => {
-    fetchData(location?.state?.status);
-  }, [page, refreshComponent, location?.state?.status]);
+    fetchData();
+  }, [page, refreshComponent]);
 
   const resetForm = () => {
     setValue('name', '');
     setValue('organizationId', '');
     setValue('orderType', '');
     setValue('endDate', '');
-    setValue('createdDate', '');
+    setValue('startDate', '');
     // setValue('status', '');
 
     setCurrentPage(1);
@@ -162,8 +142,8 @@ function Sessions() {
         <Flex align="center">
           <Breadcrumb>
             <BreadcrumbItem>
-              <BreadcrumbLink isCurrentPage href="/sessions">
-                Sessions
+              <BreadcrumbLink isCurrentPage href="/cib">
+                Cib
               </BreadcrumbLink>
             </BreadcrumbItem>
           </Breadcrumb>
@@ -224,7 +204,7 @@ function Sessions() {
               <GridItem width="85%">
                 <Controller
                   control={control}
-                  name="createdDate"
+                  name="startDate"
                   render={({ field: { onChange, value } }) => (
                     <FormControl id="address">
                       <FormLabel fontSize="sm" mb={1}>
@@ -294,7 +274,7 @@ function Sessions() {
             </Grid>
             <Flex mt={2} justify="space-between" align="center">
               <Heading size="xs" mb={1} fontWeight="medium">
-                CƏDVƏL ({sessionData?.totalCount || 0})
+                CƏDVƏL ({cibData?.totalCount || 0})
               </Heading>
               <div>
                 <IconButton
@@ -318,41 +298,35 @@ function Sessions() {
               <Table whiteSpace="pre-wrap" size="sm">
                 <Thead textAlign="left">
                   <Tr>
-                    <Th textAlign="left" textTransform="initial">
-                      İD
-                    </Th>
-                    <Th textTransform="initial">MƏNTƏQƏ İD</Th>
-                    {location?.state?.status === 1 ? (
-                      <>
-                        <Th textTransform="initial">SESSİYA İD</Th>
-                        <Th textTransform="initial">SƏBƏB</Th>
-                      </>
-                    ) : (
-                      <Th textTransform="initial">CABLE STATE</Th>
-                    )}
-                    <Th textTransform="initial">CONNECTOR</Th>
-                    <Th textTransform="initial">BAŞLAMA MÜDDƏTİ</Th>
+                    <Th />
+
+                    <Th textTransform="initial">ÖDƏNİŞ İD</Th>
+                    <Th textTransform="initial">MƏZƏNNƏ</Th>
+                    <Th textTransform="initial">SAATLIQ QİYMƏT</Th>
+                    <Th textTransform="initial">ÖDƏNİŞ MƏBLƏĞİ</Th>
+                    <Th textTransform="initial">GERİ QAYTARILAN MƏBLƏĞ</Th>
                     <Th textTransform="initial">BAŞLAMA MÜDDƏTİ (SAAT)</Th>
                   </Tr>
                 </Thead>
                 <Tbody textAlign="left">
-                  {sessionData?.data?.length > 0 ? (
-                    sessionData?.data?.map((item: any) => (
+                  {cibData?.data?.length > 0 ? (
+                    cibData?.data?.map((item: any, index: number) => (
                       <Tr textAlign="left" key={item?.id}>
-                        <Td textAlign="left">{item?.id || '-'}</Td>
-                        {location?.state?.status === 1 ? (
-                          <>
-                            <Td>{item?.sessionId || '-'}</Td>
-                            <Td>{item?.finishReason || '-'}</Td>
-                          </>
-                        ) : (
-                          <Td>{item?.cableState || '-'}</Td>
-                        )}
-                        <Td>{item?.chargePointId || '-'}</Td>
+                        <Td textAlign="left">{(page - 1) * 10 + index + 1}</Td>
 
-                        <Td>{item?.connector || '-'}</Td>
-                        <Td>{item?.createdDate?.substring(0, 10) || '-'}</Td>
-                        <Td>{item?.createdDate?.substring(11, 19) || '-'}</Td>
+                        <Td>{item?.id || '-'}</Td>
+                        <Td>{item?.currency || '-'}</Td>
+                        <Td>{item?.amount || '-'}</Td>
+                        <Td>{item?.amountCharged || '-'}</Td>
+                        {location?.state?.status === 'refunded' ? (
+                          <Td>{item?.amountRefunded}</Td>
+                        ) : (
+                          <Td>
+                            {item?.amountRefunded === 0 ? 'Yoxdur' : 'Var'}
+                          </Td>
+                        )}
+
+                        <Td>{item?.created?.substring(0, 10) || '-'}</Td>
                       </Tr>
                     ))
                   ) : (
@@ -369,7 +343,7 @@ function Sessions() {
                 </Tbody>
               </Table>
             </TableContainer>
-            {sessionData?.totalCount !== 0 && (
+            {cibData?.totalCount !== 0 && (
               <Flex
                 justify="flex-end"
                 style={{
@@ -378,9 +352,7 @@ function Sessions() {
               >
                 <Pagination
                   currentPage={page}
-                  totalCount={
-                    sessionData?.totalCount ? sessionData?.totalCount : 0
-                  }
+                  totalCount={cibData?.totalCount ? cibData?.totalCount : 0}
                   pageSize={10}
                   onPageChange={(z: number) => setCurrentPage(z)}
                 />
@@ -406,4 +378,4 @@ function Sessions() {
   );
 }
 
-export default Sessions;
+export default Archive;

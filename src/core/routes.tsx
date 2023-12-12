@@ -27,6 +27,7 @@ import Cib from '@/views/cib/cib';
 import Sessions from '@/views/sessions/sessions';
 import ActiveSessions from '@/views/active-sessions/active-sessions';
 import Reports from '@/views/reports/reports';
+import Archive from '@/views/archive/archive';
 import Login from './login/login';
 import NotFound from './404/404';
 import NoPermission from './no-permission/no-permission';
@@ -39,8 +40,8 @@ const routes = [
     path: '/',
     element: <Layout />,
     children: [
-      { path: '', element: <Navigate to="/transactions" /> },
-      { path: '/home', element: <Navigate to="/transactions" /> },
+      { path: '', element: <Navigate to="/reports" /> },
+      { path: '/home', element: <Navigate to="/reports" /> },
       // {
       //   path: '/home',
       //   index: true,
@@ -60,6 +61,18 @@ const routes = [
           <Suspense fallback={<Spinner />}>
             {' '}
             <Transactions />
+          </Suspense>
+        ) : (
+          <Navigate to="/no-permission" />
+        ),
+        permission: ['view_services_page']
+      },
+      {
+        path: 'archive',
+        element: checkPermission(['route_orders_page']) ? (
+          <Suspense fallback={<Spinner />}>
+            {' '}
+            <Archive />
           </Suspense>
         ) : (
           <Navigate to="/no-permission" />

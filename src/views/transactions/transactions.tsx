@@ -57,17 +57,29 @@ function Transactions() {
 
   console.log(queryParams);
 
-  const { handleSubmit, setValue, control } = useForm<IOrdersFilter>({
-    mode: 'onChange',
-    defaultValues: {
-      name: '',
-      organizationId: '',
-      orderType: '',
-      endDate: '',
-      startDate: ''
-      // status: ''
+  const { handleSubmit, setValue, control, getValues } = useForm<IOrdersFilter>(
+    {
+      mode: 'onChange',
+      defaultValues: {
+        name: '',
+        organizationId: '',
+        orderType: '',
+        endDate: '',
+        startDate: ''
+        // status: ''
+      }
     }
-  });
+  );
+
+  const addQueryParamsToUrl = (url: string, params: any) => {
+    const queryString = Object.keys(params)
+      .map(
+        key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
+      )
+      .join('&');
+
+    return `${url}?${queryString}`;
+  };
 
   const fetchData = async (status: number) => {
     setLoading(true);
@@ -88,7 +100,15 @@ function Transactions() {
     }
 
     const resTransaction = await fetch(
-      `https://cloud4.ninco.org:2083/api/echarge/get-transactions?pageIndex=${page}&orderStatus=${status}`,
+      addQueryParamsToUrl(
+        'https://cloud4.ninco.org:2083/api/echarge/get-transactions',
+        {
+          pageIndex: page,
+          orderStatus: status,
+          startDate: getValues('startDate'),
+          endDate: getValues('endDate')
+        }
+      ),
       {
         method: 'GET',
         headers: {
