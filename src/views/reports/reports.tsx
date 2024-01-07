@@ -436,8 +436,7 @@ function Reports() {
                         <Td textAlign="left">Müddət (saat)</Td>
                         {chartData?.map((item: any) => (
                           <Td textAlign="left">
-                            {Math.trunc(item.totalDurationInMinutes / 60) ||
-                              '-'}
+                            {item.formattedTotalDurationTime || '-'}
                           </Td>
                         ))}
                       </Tr>
