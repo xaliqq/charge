@@ -39,8 +39,8 @@ interface IOrdersFilter {
   name: string;
   organizationId: string;
   orderType: string;
-  endDate: string;
-  createdDate: string;
+  createdDateTo: string;
+  createdDateFrom: string;
   // status: string;
 }
 
@@ -64,8 +64,8 @@ function Sessions() {
         name: '',
         organizationId: '',
         orderType: '',
-        endDate: '',
-        createdDate: ''
+        createdDateTo: '',
+        createdDateFrom: ''
         // status: ''
       }
     }
@@ -106,8 +106,8 @@ function Sessions() {
       addQueryParamsToUrl(`https://cloud4.ninco.org:2083/api/echarge/${url}`, {
         pageIndex: page,
         status,
-        createdDate: getValues('createdDate')
-        // createdTo: getValues('createdTo')
+        createdDateFrom: getValues('createdDateFrom'),
+        createdDateTo: getValues('createdDateTo')
       }),
       {
         method: 'GET',
@@ -139,8 +139,8 @@ function Sessions() {
     setValue('name', '');
     setValue('organizationId', '');
     setValue('orderType', '');
-    setValue('endDate', '');
-    setValue('createdDate', '');
+    setValue('createdDateFrom', '');
+    setValue('createdDateTo', '');
     // setValue('status', '');
 
     setCurrentPage(1);
@@ -224,7 +224,7 @@ function Sessions() {
               <GridItem width="85%">
                 <Controller
                   control={control}
-                  name="createdDate"
+                  name="createdDateFrom"
                   render={({ field: { onChange, value } }) => (
                     <FormControl id="address">
                       <FormLabel fontSize="sm" mb={1}>
@@ -251,7 +251,7 @@ function Sessions() {
               <GridItem width="85%">
                 <Controller
                   control={control}
-                  name="endDate"
+                  name="createdDateTo"
                   render={({ field: { onChange, value } }) => (
                     <FormControl>
                       <FormLabel fontSize="sm" mb={1}>

@@ -1,3 +1,5 @@
+/* eslint-disable no-unsafe-optional-chaining */
+// import NoData from '@/components/feedback/no-data/no-data';
 import DatePicker from '@/components/forms/date-picker/date-picker';
 
 import { IHTTPSParams } from '@/services/config';
@@ -24,7 +26,15 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-  Skeleton
+  Skeleton,
+  TableContainer,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+  Stack
 } from '@chakra-ui/react';
 import { ApexOptions } from 'apexcharts';
 import axios from 'axios';
@@ -169,8 +179,6 @@ function Reports() {
       setToken(res?.data?.token);
     }
 
-    console.log(getValues());
-
     const resReport = await fetch(
       addQueryParamsToUrl(
         'https://cloud4.ninco.org:2083/api/echarge/transaction-report',
@@ -190,7 +198,13 @@ function Reports() {
     const resReportJson = await resReport.json();
 
     const chartReport = await fetch(
-      'https://cloud4.ninco.org:2083/api/echarge/statistics-report',
+      addQueryParamsToUrl(
+        'https://cloud4.ninco.org:2083/api/echarge/statistics-report',
+        {
+          createdFrom: getValues('createdFrom'),
+          createdTo: getValues('createdTo')
+        }
+      ),
       {
         method: 'GET',
         headers: {
@@ -346,7 +360,7 @@ function Reports() {
       <Box mt={5} shadow="lg" bg="white" borderRadius={6} w="100%" p={4}>
         {!loading ? (
           <Flex flexWrap="wrap" justifyContent="space-between">
-            <div>
+            <div style={{ marginBottom: '5rem' }}>
               <Heading ml="7.5rem" size="sm">
                 Tranzaksiyalar
               </Heading>
@@ -357,7 +371,7 @@ function Reports() {
                 width={500}
               />
             </div>
-            <div>
+            <div style={{ marginBottom: '5rem' }}>
               <Heading ml="7.5rem" size="sm">
                 Qazanılan xeyir
               </Heading>
@@ -369,7 +383,7 @@ function Reports() {
               />
             </div>
             <div>
-              <Heading mt="5rem" ml="7.5rem" size="sm">
+              <Heading ml="7.5rem" size="sm">
                 Müddət (saat)
               </Heading>
               <ReactApexChart
@@ -382,6 +396,81 @@ function Reports() {
           </Flex>
         ) : (
           <Skeleton height="70px" />
+        )}
+      </Box>
+      <Box mt={5} shadow="lg" bg="white" borderRadius={6} w="100%" p={4}>
+        {!loading ? (
+          <Box>
+            <TableContainer>
+              <Table whiteSpace="pre-wrap" size="sm">
+                <Thead textAlign="left">
+                  <Tr>
+                    <Th />
+                    {chartData?.map((item: any) => (
+                      <Th textAlign="left" textTransform="initial">
+                        {item?.chargePointName}
+                      </Th>
+                    ))}
+                  </Tr>
+                </Thead>
+                <Tbody textAlign="left">
+                  {
+                    // transactionData?.data?.length > 0 ? (
+                    <>
+                      <Tr textAlign="left">
+                        <Td textAlign="left">Tranzaksiyalar</Td>
+                        {chartData?.map((item: any) => (
+                          <Td textAlign="left">
+                            {item?.totalTransactions || '-'}
+                          </Td>
+                        ))}
+                      </Tr>
+                      <Tr textAlign="left">
+                        <Td textAlign="left">Məbləğ</Td>
+                        {chartData?.map((item: any) => (
+                          <Td textAlign="left">{item?.totalProfit || '-'}</Td>
+                        ))}
+                      </Tr>
+                      <Tr textAlign="left">
+                        <Td textAlign="left">Müddət (saat)</Td>
+                        {chartData?.map((item: any) => (
+                          <Td textAlign="left">
+                            {Math.trunc(item.totalDurationInMinutes / 60) ||
+                              '-'}
+                          </Td>
+                        ))}
+                      </Tr>
+                    </>
+
+                    // ) : (
+                    //   <Tr>
+                    //     <Td
+                    //       bg="transparent !important"
+                    //       colSpan={9}
+                    //       textAlign="center"
+                    //     >
+                    //       <NoData />
+                    //     </Td>
+                    //   </Tr>
+                    // )
+                  }
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </Box>
+        ) : (
+          <Stack>
+            <Skeleton height="30px" />
+            <Skeleton height="30px" />
+            <Skeleton height="30px" />
+            <Skeleton height="30px" />
+            <Skeleton height="30px" />
+            <Skeleton height="30px" />
+            <Skeleton height="30px" />
+            <Skeleton height="30px" />
+            <Skeleton height="30px" />
+            <Skeleton height="30px" />
+          </Stack>
         )}
       </Box>
       <Box mt={5} shadow="lg" bg="white" borderRadius={6} w="100%" p={4}>
