@@ -115,6 +115,7 @@ function Reports() {
       ]
     }
   };
+  // eslint-disable-next-line no-unused-vars
   const reportStateDuration: IReportData = {
     series: chartData?.map((item: any) =>
       Math.trunc(item.totalDurationInMinutes / 60)
@@ -382,7 +383,7 @@ function Reports() {
                 width={500}
               />
             </div>
-            <div>
+            {/* <div>
               <Heading ml="7.5rem" size="sm">
                 Müddət (saat)
               </Heading>
@@ -392,7 +393,7 @@ function Reports() {
                 type="pie"
                 width={500}
               />
-            </div>
+            </div> */}
           </Flex>
         ) : (
           <Skeleton height="70px" />
@@ -431,7 +432,7 @@ function Reports() {
                           <Td textAlign="left">{item?.totalProfit || '-'}</Td>
                         ))}
                       </Tr>
-                      <Tr textAlign="left">
+                      {/* <Tr textAlign="left">
                         <Td textAlign="left">Müddət (saat)</Td>
                         {chartData?.map((item: any) => (
                           <Td textAlign="left">
@@ -439,7 +440,7 @@ function Reports() {
                               '-'}
                           </Td>
                         ))}
-                      </Tr>
+                      </Tr> */}
                     </>
 
                     // ) : (
